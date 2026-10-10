@@ -3,57 +3,107 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
     QApplication, QComboBox, QFrame, QHBoxLayout,
     QHeaderView, QLabel, QLineEdit, QMainWindow, QPushButton,
-    QStackedWidget, QTableWidget, QVBoxLayout, QWidget
+    QStackedWidget, QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget
 )
 
 # ---------------------------------------------------------
-# GENEL STİL PALETİ VE QSS TANIMLARI
+# MODERN DARK TEMA (QSS)
 # ---------------------------------------------------------
-BASE_STYLE = """
+MODERN_STYLE = """
     QWidget {
-        font-family: 'Segoe UI', Arial, sans-serif;
+        font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
         font-size: 13px;
-        color: #ECF0F1;
-        background-color: #1E1E2E;
+        color: #E2E8F0;
+        background-color: #0F172A;
     }
+    
+    /* Input & Search Fields */
     QLineEdit {
-        background-color: #2A2A3D;
-        border: 2px solid #3B3B54;
+        background-color: #1E293B;
+        border: 1px solid #334155;
         border-radius: 8px;
-        padding: 8px 12px;
-        color: #FFFFFF;
+        padding: 10px 14px;
+        color: #F8FAFC;
+        font-size: 13px;
     }
-    QLineEdit:focus { border: 2px solid #89B4FA; }
+    QLineEdit:focus {
+        border: 1px solid #3B82F6;
+        background-color: #0F172A;
+    }
+    
+    /* Buttons */
     QPushButton {
-        background-color: #3B3B54;
-        border: none;
+        background-color: #1E293B;
+        border: 1px solid #334155;
         border-radius: 8px;
-        padding: 10px 18px;
-        font-weight: bold;
-        color: #FFFFFF;
+        padding: 10px 16px;
+        font-weight: 600;
+        color: #CBD5E1;
     }
-    QPushButton:hover { background-color: #4A4A6A; }
-    QPushButton:pressed { background-color: #2A2A3D; }
+    QPushButton:hover {
+        background-color: #334155;
+        color: #FFFFFF;
+        border-color: #475569;
+    }
+    QPushButton:pressed {
+        background-color: #0F172A;
+    }
+    
+    /* Primary Accent Button */
+    QPushButton#primaryBtn {
+        background-color: #3B82F6;
+        color: #FFFFFF;
+        border: none;
+    }
+    QPushButton#primaryBtn:hover {
+        background-color: #2563EB;
+    }
+    
+    /* Danger / Close Button */
+    QPushButton#dangerBtn {
+        background-color: #EF4444;
+        color: #FFFFFF;
+        border: none;
+    }
+    QPushButton#dangerBtn:hover {
+        background-color: #DC2626;
+    }
+
+    /* Table Styling */
     QTableWidget {
-        background-color: #252538;
-        border: 1px solid #3B3B54;
-        border-radius: 8px;
-        gridline-color: #3B3B54;
+        background-color: #1E293B;
+        border: 1px solid #334155;
+        border-radius: 10px;
+        gridline-color: #334155;
+        outline: none;
+    }
+    QTableWidget::item {
+        padding: 8px;
+    }
+    QTableWidget::item:selected {
+        background-color: #3B82F6;
+        color: #FFFFFF;
     }
     QHeaderView::section {
-        background-color: #181825;
-        padding: 8px;
-        font-weight: bold;
+        background-color: #0F172A;
+        color: #94A3B8;
+        padding: 10px;
+        font-weight: 700;
         border: none;
-        border-bottom: 2px solid #3B3B54;
+        border-bottom: 2px solid #334155;
+        text-transform: uppercase;
+        font-size: 11px;
     }
+
+    /* ComboBox Styling */
     QComboBox {
-        background-color: #2A2A3D;
-        border: 2px solid #3B3B54;
+        background-color: #1E293B;
+        border: 1px solid #334155;
         border-radius: 8px;
-        padding: 6px 12px;
-        color: #FFFFFF;
+        padding: 8px 12px;
+        color: #F8FAFC;
     }
+    QComboBox::drop-down { border: none; }
 """
 
 # ---------------------------------------------------------
@@ -69,51 +119,65 @@ class LoginWindow(QWidget):
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        frame = QFrame()
-        frame.setStyleSheet("QFrame { background-color: #252538; border: 2px solid #45475A; border-radius: 16px; padding: 24px; }")
-        frame_layout = QVBoxLayout(frame)
+        card = QFrame()
+        card.setFixedWidth(380)
+        card.setStyleSheet("""
+            QFrame {
+                background-color: #1E293B;
+                border: 1px solid #334155;
+                border-radius: 16px;
+                padding: 32px;
+            }
+        """)
+        card_layout = QVBoxLayout(card)
+        card_layout.setSpacing(14)
 
-        title = QLabel("CRM Portal Login")
-        title.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        title.setStyleSheet("font-size: 20px; font-weight: bold; color: #89B4FA; margin-bottom: 12px;")
+        logo_label = QLabel("⚡ CRM PORTAL")
+        logo_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        logo_label.setStyleSheet("font-size: 22px; font-weight: 800; color: #3B82F6; border: none; background: transparent;")
+
+        sub_label = QLabel("Giriş yapmak için bilgilerinizi girin")
+        sub_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        sub_label.setStyleSheet("font-size: 12px; color: #94A3B8; border: none; background: transparent; margin-bottom: 10px;")
 
         self.username_input = QLineEdit()
-        self.username_input.setPlaceholderText("Username (Type 'admin' for Admin view)")
+        self.username_input.setPlaceholderText("Kullanıcı Adı (Admin için 'admin')")
 
         self.password_input = QLineEdit()
-        self.password_input.setPlaceholderText("Password")
+        self.password_input.setPlaceholderText("Şifre")
         self.password_input.setEchoMode(QLineEdit.EchoMode.Password)
 
         self.warning_label = QLabel("")
         self.warning_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.warning_label.setStyleSheet("color: #F38BA8; font-size: 12px;")
+        self.warning_label.setStyleSheet("color: #EF4444; font-size: 12px; border: none; background: transparent;")
 
-        btn_login = QPushButton("Login")
-        btn_login.setStyleSheet("background-color: #89B4FA; color: #11111B;")
+        btn_login = QPushButton("Giriş Yap")
+        btn_login.setObjectName("primaryBtn")
         btn_login.clicked.connect(self.handle_login)
 
-        btn_close = QPushButton("Close")
-        btn_close.setStyleSheet("background-color: #F38BA8; color: #11111B;")
+        btn_close = QPushButton("Uygulamayı Kapat")
+        btn_close.setObjectName("dangerBtn")
         btn_close.clicked.connect(QApplication.instance().quit)
 
-        frame_layout.addWidget(title)
-        frame_layout.addWidget(self.username_input)
-        frame_layout.addWidget(self.password_input)
-        frame_layout.addWidget(self.warning_label)
-        frame_layout.addWidget(btn_login)
-        frame_layout.addWidget(btn_close)
+        card_layout.addWidget(logo_label)
+        card_layout.addWidget(sub_label)
+        card_layout.addWidget(self.username_input)
+        card_layout.addWidget(self.password_input)
+        card_layout.addWidget(self.warning_label)
+        card_layout.addWidget(btn_login)
+        card_layout.addWidget(btn_close)
 
-        layout.addWidget(frame)
+        layout.addWidget(card)
         self.setLayout(layout)
 
     def handle_login(self):
         user = self.username_input.text().strip().lower()
         if user == "admin":
             self.main_app.is_admin = True
-            self.main_app.show_page("admin_preferences")
+            self.main_app.show_main_layout("admin_preferences")
         else:
             self.main_app.is_admin = False
-            self.main_app.show_page("user_preferences")
+            self.main_app.show_main_layout("user_preferences")
 
 # ---------------------------------------------------------
 # 2. PREFERENCES MENU
@@ -128,34 +192,36 @@ class UserPreferencesWindow(QWidget):
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        frame = QFrame()
-        frame.setStyleSheet("QFrame { background-color: #1E2D2F; border: 2px solid #A6E3A1; border-radius: 16px; padding: 24px; }")
-        frame_layout = QVBoxLayout(frame)
+        card = QFrame()
+        card.setFixedWidth(420)
+        card.setStyleSheet("QFrame { background-color: #1E293B; border: 1px solid #10B981; border-radius: 16px; padding: 28px; }")
+        card_layout = QVBoxLayout(card)
+        card_layout.setSpacing(12)
 
-        title = QLabel("Preferences Menu")
+        title = QLabel("Kullanıcı Tercihleri")
         title.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        title.setStyleSheet("font-size: 18px; font-weight: bold; color: #A6E3A1; margin-bottom: 16px;")
+        title.setStyleSheet("font-size: 20px; font-weight: 700; color: #10B981; border: none; background: transparent;")
 
         btn_apps = QPushButton("Applications")
-        btn_apps.clicked.connect(lambda: self.main_app.show_page("applications"))
+        btn_apps.clicked.connect(lambda: self.main_app.navigate_to("applications"))
 
         btn_mentor = QPushButton("Mentor Interview")
-        btn_mentor.clicked.connect(lambda: self.main_app.show_page("mentor_interview"))
+        btn_mentor.clicked.connect(lambda: self.main_app.navigate_to("mentor_interview"))
 
         btn_interviews = QPushButton("Interviews")
-        btn_interviews.clicked.connect(lambda: self.main_app.show_page("interviews"))
+        btn_interviews.clicked.connect(lambda: self.main_app.navigate_to("interviews"))
 
-        btn_close = QPushButton("Close")
-        btn_close.setStyleSheet("background-color: #F38BA8; color: #11111B;")
-        btn_close.clicked.connect(lambda: self.main_app.show_page("login"))
+        btn_close = QPushButton("Çıkış Yap")
+        btn_close.setObjectName("dangerBtn")
+        btn_close.clicked.connect(self.main_app.logout)
 
-        frame_layout.addWidget(title)
-        frame_layout.addWidget(btn_apps)
-        frame_layout.addWidget(btn_mentor)
-        frame_layout.addWidget(btn_interviews)
-        frame_layout.addWidget(btn_close)
+        card_layout.addWidget(title)
+        card_layout.addWidget(btn_apps)
+        card_layout.addWidget(btn_mentor)
+        card_layout.addWidget(btn_interviews)
+        card_layout.addWidget(btn_close)
 
-        layout.addWidget(frame)
+        layout.addWidget(card)
         self.setLayout(layout)
 
 # ---------------------------------------------------------
@@ -171,39 +237,41 @@ class AdminPreferencesWindow(QWidget):
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        frame = QFrame()
-        frame.setStyleSheet("QFrame { background-color: #2D1E2F; border: 2px solid #F5C2E7; border-radius: 16px; padding: 24px; }")
-        frame_layout = QVBoxLayout(frame)
+        card = QFrame()
+        card.setFixedWidth(420)
+        card.setStyleSheet("QFrame { background-color: #1E293B; border: 1px solid #EC4899; border-radius: 16px; padding: 28px; }")
+        card_layout = QVBoxLayout(card)
+        card_layout.setSpacing(12)
 
-        title = QLabel("Preferences — Admin Menu")
+        title = QLabel("Admin Tercihleri")
         title.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        title.setStyleSheet("font-size: 18px; font-weight: bold; color: #F5C2E7; margin-bottom: 16px;")
+        title.setStyleSheet("font-size: 20px; font-weight: 700; color: #EC4899; border: none; background: transparent;")
 
         btn_apps = QPushButton("Applications")
-        btn_apps.clicked.connect(lambda: self.main_app.show_page("applications"))
+        btn_apps.clicked.connect(lambda: self.main_app.navigate_to("applications"))
 
         btn_mentor = QPushButton("Mentor Interview")
-        btn_mentor.clicked.connect(lambda: self.main_app.show_page("mentor_interview"))
+        btn_mentor.clicked.connect(lambda: self.main_app.navigate_to("mentor_interview"))
 
         btn_interviews = QPushButton("Interviews")
-        btn_interviews.clicked.connect(lambda: self.main_app.show_page("interviews"))
+        btn_interviews.clicked.connect(lambda: self.main_app.navigate_to("interviews"))
 
-        btn_admin = QPushButton("Admin")
-        btn_admin.setStyleSheet("background-color: #F5C2E7; color: #11111B;")
-        btn_admin.clicked.connect(lambda: self.main_app.show_page("admin_menu"))
+        btn_admin = QPushButton("Admin Settings")
+        btn_admin.setStyleSheet("background-color: #EC4899; color: #FFFFFF; border: none;")
+        btn_admin.clicked.connect(lambda: self.main_app.navigate_to("admin_menu"))
 
-        btn_close = QPushButton("Close")
-        btn_close.setStyleSheet("background-color: #F38BA8; color: #11111B;")
-        btn_close.clicked.connect(lambda: self.main_app.show_page("login"))
+        btn_close = QPushButton("Çıkış Yap")
+        btn_close.setObjectName("dangerBtn")
+        btn_close.clicked.connect(self.main_app.logout)
 
-        frame_layout.addWidget(title)
-        frame_layout.addWidget(btn_apps)
-        frame_layout.addWidget(btn_mentor)
-        frame_layout.addWidget(btn_interviews)
-        frame_layout.addWidget(btn_admin)
-        frame_layout.addWidget(btn_close)
+        card_layout.addWidget(title)
+        card_layout.addWidget(btn_apps)
+        card_layout.addWidget(btn_mentor)
+        card_layout.addWidget(btn_interviews)
+        card_layout.addWidget(btn_admin)
+        card_layout.addWidget(btn_close)
 
-        layout.addWidget(frame)
+        layout.addWidget(card)
         self.setLayout(layout)
 
 # ---------------------------------------------------------
@@ -217,26 +285,25 @@ class ApplicationsWindow(QWidget):
 
     def init_ui(self):
         layout = QVBoxLayout()
+        layout.setContentsMargins(20, 20, 20, 20)
+        layout.setSpacing(16)
 
-        frame = QFrame()
-        frame.setStyleSheet("QFrame { background-color: #1E1E2E; border: 2px solid #89B4FA; border-radius: 12px; padding: 16px; }")
-        frame_layout = QVBoxLayout(frame)
-
-        search_layout = QHBoxLayout()
+        # Top Bar (Search + Filter)
+        top_bar = QHBoxLayout()
         search_input = QLineEdit()
-        search_input.setPlaceholderText("Search Applications...")
-        btn_search = QPushButton("Search")
-        search_layout.addWidget(search_input)
-        search_layout.addWidget(btn_search)
+        search_input.setPlaceholderText("Başvurularda ara...")
+        btn_search = QPushButton("Ara")
+        btn_search.setObjectName("primaryBtn")
+        
+        top_bar.addWidget(search_input)
+        top_bar.addWidget(btn_search)
 
-        filter_layout = QHBoxLayout()
-        btn_all = QPushButton("All Applications")
-        btn_defined = QPushButton("Mentor Meeting Defined")
-        btn_not_defined = QPushButton("Mentor Meeting Not Defined")
-        filter_layout.addWidget(btn_all)
-        filter_layout.addWidget(btn_defined)
-        filter_layout.addWidget(btn_not_defined)
+        filter_bar = QHBoxLayout()
+        filter_bar.addWidget(QPushButton("All Applications"))
+        filter_bar.addWidget(QPushButton("Mentor Meeting Defined"))
+        filter_bar.addWidget(QPushButton("Mentor Meeting Not Defined"))
 
+        # Table
         table = QTableWidget()
         table.setColumnCount(7)
         table.setHorizontalHeaderLabels([
@@ -246,15 +313,13 @@ class ApplicationsWindow(QWidget):
         table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
 
         btn_return = QPushButton("Return to Preferences Screen")
-        btn_return.setStyleSheet("background-color: #FAB387; color: #11111B;")
         btn_return.clicked.connect(self.main_app.return_to_preferences)
 
-        frame_layout.addLayout(search_layout)
-        frame_layout.addLayout(filter_layout)
-        frame_layout.addWidget(table)
-        frame_layout.addWidget(btn_return)
+        layout.addLayout(top_bar)
+        layout.addLayout(filter_bar)
+        layout.addWidget(table)
+        layout.addWidget(btn_return)
 
-        layout.addWidget(frame)
         self.setLayout(layout)
 
 # ---------------------------------------------------------
@@ -268,24 +333,23 @@ class MentorInterviewWindow(QWidget):
 
     def init_ui(self):
         layout = QVBoxLayout()
+        layout.setContentsMargins(20, 20, 20, 20)
+        layout.setSpacing(16)
 
-        frame = QFrame()
-        frame.setStyleSheet("QFrame { background-color: #1E1E2E; border: 2px solid #A6E3A1; border-radius: 12px; padding: 16px; }")
-        frame_layout = QVBoxLayout(frame)
-
-        top_layout = QHBoxLayout()
+        top_bar = QHBoxLayout()
         search_input = QLineEdit()
-        search_input.setPlaceholderText("Search Conversations...")
-        btn_search = QPushButton("Search")
-        
+        search_input.setPlaceholderText("Görüşmelerde ara...")
+        btn_search = QPushButton("Ara")
+        btn_search.setObjectName("primaryBtn")
+
         combo_filter = QComboBox()
         combo_filter.addItems(["Edit Items", "Tab 1", "Tab 2", "Tab 3"])
 
-        top_layout.addWidget(search_input)
-        top_layout.addWidget(btn_search)
-        top_layout.addWidget(combo_filter)
+        top_bar.addWidget(search_input)
+        top_bar.addWidget(btn_search)
+        top_bar.addWidget(combo_filter)
 
-        btn_all_conversations = QPushButton("All Conversations")
+        btn_all = QPushButton("All Conversations")
 
         table = QTableWidget()
         table.setColumnCount(5)
@@ -293,15 +357,13 @@ class MentorInterviewWindow(QWidget):
         table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
 
         btn_return = QPushButton("Return to Preferences Screen")
-        btn_return.setStyleSheet("background-color: #FAB387; color: #11111B;")
         btn_return.clicked.connect(self.main_app.return_to_preferences)
 
-        frame_layout.addLayout(top_layout)
-        frame_layout.addWidget(btn_all_conversations)
-        frame_layout.addWidget(table)
-        frame_layout.addWidget(btn_return)
+        layout.addLayout(top_bar)
+        layout.addWidget(btn_all)
+        layout.addWidget(table)
+        layout.addWidget(btn_return)
 
-        layout.addWidget(frame)
         self.setLayout(layout)
 
 # ---------------------------------------------------------
@@ -315,23 +377,20 @@ class InterviewsWindow(QWidget):
 
     def init_ui(self):
         layout = QVBoxLayout()
+        layout.setContentsMargins(20, 20, 20, 20)
+        layout.setSpacing(16)
 
-        frame = QFrame()
-        frame.setStyleSheet("QFrame { background-color: #1E1E2E; border: 2px solid #CBA6F7; border-radius: 12px; padding: 16px; }")
-        frame_layout = QVBoxLayout(frame)
-
-        search_layout = QHBoxLayout()
+        top_bar = QHBoxLayout()
         search_input = QLineEdit()
-        search_input.setPlaceholderText("Search Interviews...")
-        btn_search = QPushButton("Search")
-        search_layout.addWidget(search_input)
-        search_layout.addWidget(btn_search)
+        search_input.setPlaceholderText("Mülakatlarda ara...")
+        btn_search = QPushButton("Ara")
+        btn_search.setObjectName("primaryBtn")
+        top_bar.addWidget(search_input)
+        top_bar.addWidget(btn_search)
 
-        btn_layout = QHBoxLayout()
-        btn_proj_sent = QPushButton("Project Sent")
-        btn_proj_received = QPushButton("Project Received")
-        btn_layout.addWidget(btn_proj_sent)
-        btn_layout.addWidget(btn_proj_received)
+        filter_bar = QHBoxLayout()
+        filter_bar.addWidget(QPushButton("Project Sent"))
+        filter_bar.addWidget(QPushButton("Project Received"))
 
         table = QTableWidget()
         table.setColumnCount(4)
@@ -339,15 +398,13 @@ class InterviewsWindow(QWidget):
         table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
 
         btn_return = QPushButton("Return to Preferences Screen")
-        btn_return.setStyleSheet("background-color: #FAB387; color: #11111B;")
         btn_return.clicked.connect(self.main_app.return_to_preferences)
 
-        frame_layout.addLayout(search_layout)
-        frame_layout.addLayout(btn_layout)
-        frame_layout.addWidget(table)
-        frame_layout.addWidget(btn_return)
+        layout.addLayout(top_bar)
+        layout.addLayout(filter_bar)
+        layout.addWidget(table)
+        layout.addWidget(btn_return)
 
-        layout.addWidget(frame)
         self.setLayout(layout)
 
 # ---------------------------------------------------------
@@ -361,59 +418,110 @@ class AdminMenuWindow(QWidget):
 
     def init_ui(self):
         layout = QVBoxLayout()
+        layout.setContentsMargins(20, 20, 20, 20)
+        layout.setSpacing(16)
 
-        frame = QFrame()
-        frame.setStyleSheet("QFrame { background-color: #1E1E2E; border: 2px solid #F5C2E7; border-radius: 12px; padding: 16px; }")
-        frame_layout = QVBoxLayout(frame)
-
-        title = QLabel("Admin Menu")
-        title.setStyleSheet("font-size: 16px; font-weight: bold; color: #F5C2E7;")
-
-        btn_layout = QHBoxLayout()
+        action_bar = QHBoxLayout()
         btn_event = QPushButton("Event Record")
+        btn_event.setObjectName("primaryBtn")
         btn_mail = QPushButton("Mail")
-        btn_layout.addWidget(btn_event)
-        btn_layout.addWidget(btn_mail)
+        action_bar.addWidget(btn_event)
+        action_bar.addWidget(btn_mail)
 
         table = QTableWidget()
         table.setColumnCount(4)
         table.setHorizontalHeaderLabels(["Event Title", "Date", "Participants", "Mail Status"])
         table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
 
-        bottom_layout = QHBoxLayout()
+        bottom_bar = QHBoxLayout()
         btn_return_admin = QPushButton("Preferences — Return to Admin Screen")
-        btn_return_admin.setStyleSheet("background-color: #FAB387; color: #11111B;")
-        btn_return_admin.clicked.connect(lambda: self.main_app.show_page("admin_preferences"))
+        btn_return_admin.clicked.connect(lambda: self.main_app.navigate_to("admin_preferences"))
 
         btn_exit = QPushButton("Exit")
-        btn_exit.setStyleSheet("background-color: #F38BA8; color: #11111B;")
+        btn_exit.setObjectName("dangerBtn")
         btn_exit.clicked.connect(QApplication.instance().quit)
 
-        bottom_layout.addWidget(btn_return_admin)
-        bottom_layout.addWidget(btn_exit)
+        bottom_bar.addWidget(btn_return_admin)
+        bottom_bar.addWidget(btn_exit)
 
-        frame_layout.addWidget(title)
-        frame_layout.addLayout(btn_layout)
-        frame_layout.addWidget(table)
-        frame_layout.addLayout(bottom_layout)
+        layout.addLayout(action_bar)
+        layout.addWidget(table)
+        layout.addLayout(bottom_bar)
 
-        layout.addWidget(frame)
         self.setLayout(layout)
 
 # ---------------------------------------------------------
-# ANA UYGULAMA VE SAYFA GEÇİŞLERİ
+# MODERN MAIN LAYOUT WITH SIDEBAR & STACKED WIDGET
 # ---------------------------------------------------------
 class CRMApplication(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("CRM Capstone Project — Interface Design")
-        self.resize(950, 680)
-        self.setStyleSheet(BASE_STYLE)
+        self.setWindowTitle("CRM Capstone Portal — Modern UI")
+        self.resize(1100, 700)
+        self.setStyleSheet(MODERN_STYLE)
 
         self.is_admin = False
 
+        # Central Layout Container
+        self.main_container = QWidget()
+        self.root_layout = QHBoxLayout(self.main_container)
+        self.root_layout.setContentsMargins(0, 0, 0, 0)
+        self.root_layout.setSpacing(0)
+
+        # 1. Sidebar Setup
+        self.sidebar = QFrame()
+        self.sidebar.setFixedWidth(220)
+        self.sidebar.setStyleSheet("""
+            QFrame {
+                background-color: #1E293B;
+                border-right: 1px solid #334155;
+            }
+            QPushButton {
+                text-align: left;
+                padding: 12px 16px;
+                background: transparent;
+                border: none;
+                border-radius: 6px;
+                color: #94A3B8;
+            }
+            QPushButton:hover {
+                background-color: #334155;
+                color: #FFFFFF;
+            }
+        """)
+        self.sidebar_layout = QVBoxLayout(self.sidebar)
+        self.sidebar_layout.setContentsMargins(12, 20, 12, 20)
+
+        sidebar_title = QLabel("⚡ CRM PORTAL")
+        sidebar_title.setStyleSheet("font-size: 16px; font-weight: 800; color: #3B82F6; margin-bottom: 20px; border: none;")
+        self.sidebar_layout.addWidget(sidebar_title)
+
+        # Sidebar Buttons
+        self.btn_nav_pref = QPushButton("🏠 Preferences")
+        self.btn_nav_apps = QPushButton("📋 Applications")
+        self.btn_nav_mentor = QPushButton("👥 Mentor Interview")
+        self.btn_nav_interviews = QPushButton("💼 Interviews")
+        self.btn_nav_admin = QPushButton("⚙️ Admin Menu")
+
+        self.btn_nav_pref.clicked.connect(self.return_to_preferences)
+        self.btn_nav_apps.clicked.connect(lambda: self.navigate_to("applications"))
+        self.btn_nav_mentor.clicked.connect(lambda: self.navigate_to("mentor_interview"))
+        self.btn_nav_interviews.clicked.connect(lambda: self.navigate_to("interviews"))
+        self.btn_nav_admin.clicked.connect(lambda: self.navigate_to("admin_menu"))
+
+        self.sidebar_layout.addWidget(self.btn_nav_pref)
+        self.sidebar_layout.addWidget(self.btn_nav_apps)
+        self.sidebar_layout.addWidget(self.btn_nav_mentor)
+        self.sidebar_layout.addWidget(self.btn_nav_interviews)
+        self.sidebar_layout.addWidget(self.btn_nav_admin)
+        self.sidebar_layout.addStretch()
+
+        btn_logout = QPushButton("🚪 Logout")
+        btn_logout.clicked.connect(self.logout)
+        self.sidebar_layout.addWidget(btn_logout)
+
+        # 2. Content Stack Setup
         self.stacked_widget = QStackedWidget()
-        self.setCentralWidget(self.stacked_widget)
 
         self.pages = {
             "login": LoginWindow(self),
@@ -428,17 +536,36 @@ class CRMApplication(QMainWindow):
         for page in self.pages.values():
             self.stacked_widget.addWidget(page)
 
-        self.show_page("login")
+        # Add to Root Layout
+        self.root_layout.addWidget(self.sidebar)
+        self.root_layout.addWidget(self.stacked_widget)
 
-    def show_page(self, page_name):
+        self.setCentralWidget(self.main_container)
+        self.show_login()
+
+    def show_login(self):
+        self.sidebar.hide()
+        self.stacked_widget.setCurrentWidget(self.pages["login"])
+
+    def show_main_layout(self, pref_page):
+        self.sidebar.show()
+        # Admin butonu gizleme/gösterme kontrolü
+        self.btn_nav_admin.setVisible(self.is_admin)
+        self.stacked_widget.setCurrentWidget(self.pages[pref_page])
+
+    def navigate_to(self, page_name):
         if page_name in self.pages:
             self.stacked_widget.setCurrentWidget(self.pages[page_name])
 
     def return_to_preferences(self):
         if self.is_admin:
-            self.show_page("admin_preferences")
+            self.navigate_to("admin_preferences")
         else:
-            self.show_page("user_preferences")
+            self.navigate_to("user_preferences")
+
+    def logout(self):
+        self.is_admin = False
+        self.show_login()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
